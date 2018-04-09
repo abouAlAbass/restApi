@@ -37,6 +37,19 @@
       </div>
     </nav>
 <main role="main" class="container">
+    <h1>Add Item</h1>
+    <form id="itemForm">
+        <div>
+            <label>text</label>
+            <input type="text" id="text" class="form-control">            
+        </div>
+        <div>
+            <label>Body</label>
+            <textarea id="body" class="form-control"></textarea>            
+        </div>
+        <input type="submit" value="submit" class="bt btn-primary">
+        <br>
+    </form>
     <div class="starter-template">
         <ul id="items" class="list-group">
 
@@ -48,16 +61,18 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script>
     $(document).ready(function(){
-        
+        var url_api= 'http://restapi.test/api/items';
+
+        // get and show all items
         function getItems(){
             $.ajax({
-            url:'http://restapi.test/api/items',
+            url:url_api,
             type:'GET',
             success:function(data){
               var output= '';
               console.log(data);
             data.forEach(item => {
-            output+='<li class="list-group-item"><strong>'+item.text+' : </strong>'+item.body+'</li>';
+            output+='<li class="list-group-item"><strong>'+item.text+' : </strong>'+item.body+'<a href="#" class="deleteLink" data-id="'+item.id+'">delete</a></li>';
             });
             console.log(output);
             $('#items').append(output);
@@ -67,6 +82,61 @@
             }
         });
         }
+        //add event
+        $('#itemForm').on('submit', function(e){
+            e.preventDefault();
+
+            var text = $('#text').val();
+            var body = $('#body').val();
+
+            addItem(text, body);
+        });
+
+        // add item function
+        function addItem(text, body){
+            $.ajax({
+            url:url_api,
+            type:'POST',
+            data : {text: text, body: body},
+            success:function(data){
+            alert('Item # '+data.id+'added');
+
+              location.reload();
+            },
+            error: function(e){
+                console.log(e.responseText);
+            }
+        });
+        }
+
+        //Delete event
+        $('body').on('click','.deleteLink',function(e){
+            e.preventDefault();
+
+            var id = $(this).data('id');
+            
+            deleteItem(id);
+        });
+
+        //deelete function
+        
+        function deleteItem(id){
+            $.ajax({
+            url:url_api+'/'+id,
+            type:'POST',
+            data : {_method: 'DELETE'},
+            success:function(data){
+            alert('Item Removed',id);
+
+              location.reload();
+            },
+            error: function(e){
+                console.log(e.responseText);
+            }
+        });
+        }
+
+        //call to the get items function
         getItems();
     });
 </script>
