@@ -11,6 +11,10 @@ class ItemTableSeeder extends Seeder
      */
     public function run()
     {
-        //
+        DB::table('items')->insert([
+            'text' => str_random(50),
+            'body' => str_random(250),
+           
+        ]);
     }
 }
